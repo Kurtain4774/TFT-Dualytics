@@ -1,0 +1,75 @@
+.boardWrapper {
+  position: relative;
+  border-radius: 0;
+  padding: 10px;
+  z-index: 0;
+  background: transparent;
+  border: 3px solid var(--bg-border);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.board {
+  position: relative;
+}
+
+/* ── Cell wrapper — positions hex + equipped items row ──── */
+.cellWrap {
+  position: absolute;
+  /* No overflow hidden: equipped items and star badge sit outside the hex. */
+}
+
+.starBadge {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  background: var(--cost-5);
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 1px 4px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.badgeStar {
+  font-size: 8px;
+  color: #000000;
+  line-height: 1;
+}
+
+.unitName {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--unit-label-bg);
+  color: var(--unit-label-text);
+  padding: 1px 6px;
+  border-radius: 0;
+  font-family: 'D-DIN-Bold', 'D-DIN', Arial, Verdana, sans-serif;
+  font-size: 0.63rem;
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 5;
+  border: 1px solid var(--bg-border);
+}
+
+/* Optional: Hide the name while dragging if it gets in the way */
+.cellWrap:active .unitName {
+  display: none;
+}
+
+
+@media (max-width: 1100px) {
+  .boardWrapper {
+    border: none;
+    /* OR use 'border-color: transparent;' if you want to keep the padding/spacing consistent */
+  }
+}

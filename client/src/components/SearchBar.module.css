@@ -1,0 +1,110 @@
+.form {
+  margin-bottom: 2.25rem;
+}
+
+.inputs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.select,
+.input {
+  background: var(--bg-input);
+  border: 1px solid var(--bg-border-bright);
+  color: var(--text-primary);
+  border-radius: 5px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.85rem;
+  transition:
+    border-color var(--t-fast),
+    box-shadow var(--t-fast),
+    background var(--t-fast);
+  min-height: 44px;
+}
+
+.select {
+  padding: 0.5rem 2rem 0.5rem 0.625rem;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: var(--select-caret-down);
+  background-repeat: no-repeat;
+  background-position: right 0.625rem center;
+  background-size: 10px 7px;
+}
+
+.input {
+  padding: 0.5rem 0.875rem;
+  min-width: 220px;
+}
+
+.input:focus,
+.select:focus {
+  border-color: var(--focus-border);
+  box-shadow: 0 0 0 2px var(--focus-ring);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.submitBtn {
+  background: linear-gradient(
+    135deg,
+    #c49530 0%,
+    var(--accent-gold) 55%,
+    #b8892a 100%
+  );
+  border: none;
+  color: #0a0800;
+  padding: 0.5rem 1.5rem;
+  border-radius: 5px;
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  min-height: 44px;
+  box-shadow: 0 2px 12px var(--accent-gold-glow);
+  transition:
+    filter var(--t-fast),
+    box-shadow var(--t-fast),
+    transform var(--t-fast);
+}
+
+.submitBtn:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 20px var(--accent-gold-glow);
+  transform: translateY(-1px);
+}
+
+.submitBtn:active {
+  transform: translateY(0);
+  filter: brightness(0.95);
+}
+
+.submitBtn:disabled {
+  cursor: wait;
+  filter: grayscale(0.45) brightness(0.8);
+  transform: none;
+}
+
+.error {
+  color: var(--accent-red);
+  font-size: 0.78rem;
+  margin-top: 0.5rem;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 760px) {
+  .inputs {
+    flex-direction: column;
+  }
+
+  .input,
+  .select,
+  .submitBtn {
+    width: 100%;
+  }
+}

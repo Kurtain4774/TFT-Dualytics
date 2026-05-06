@@ -1,0 +1,129 @@
+.page {
+  padding: 3rem 2rem 4rem;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+/* ── Hero title — D-DIN-Bold 48px uppercase ─────────────── */
+.title {
+  font-family: "D-DIN-Bold", "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.lastUpdated {
+  font-family: "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 2.25rem;
+}
+
+/* ── Section styling ────────────────────────────────────── */
+.section {
+  margin-bottom: 2.5rem;
+}
+
+.sectionTitle {
+  font-family: "D-DIN-Bold", "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.81rem;
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: 1.17px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--bg-border);
+}
+
+/* ── Body text ─────────────────────────────────────────── */
+.body {
+  font-family: "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.94rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+/* ── Bullet list ───────────────────────────────────────── */
+.list {
+  font-family: "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.94rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+  list-style-position: outside;
+}
+
+.list li {
+  margin-bottom: 0.5rem;
+}
+
+/* ── Subsections (Accuracy, Privacy, etc.) ──────────────── */
+.subsection {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+  padding-left: 1rem;
+}
+
+.subsectionTitle {
+  font-family: "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.81rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+/* ── Responsive ────────────────────────────────────────– */
+@media (max-width: 760px) {
+  .page {
+    padding: 1.5rem 1rem 2rem;
+  }
+
+  .title {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .lastUpdated {
+    font-size: 0.7rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .section {
+    margin-bottom: 1.75rem;
+  }
+
+  .sectionTitle {
+    font-size: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .body {
+    font-size: 0.875rem;
+  }
+
+  .list {
+    font-size: 0.875rem;
+    margin-left: 1.5rem;
+  }
+
+  .subsection {
+    padding-left: 0.5rem;
+  }
+}

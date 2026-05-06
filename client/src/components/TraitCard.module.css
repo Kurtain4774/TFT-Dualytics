@@ -1,0 +1,235 @@
+.card {
+  width: 320px;
+  background: var(--bg-card);
+  border: 1px solid var(--ghost-border);
+  padding: 14px;
+  pointer-events: none;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--bg-border-muted);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.traitIcon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.traitName {
+  font-family: 'D-DIN-Bold', 'D-DIN', Arial, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 1.17px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+/* ── Breakpoint badges (header right) ───────────────────── */
+.breakpoints {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: 'D-DIN-Bold', 'D-DIN', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.bpGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.bp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  padding: 2px 5px;
+  border: 1px solid transparent;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.bpHit {
+  color: var(--text-secondary);
+}
+
+.bpInactive {
+  color: var(--text-muted);
+}
+
+.bpSep {
+  color: var(--text-muted);
+  font-size: 0.6rem;
+}
+
+.bp_style1 {
+  background: linear-gradient(145deg, rgba(138, 90, 59, 0.55) 0%, rgba(74, 47, 30, 0.55) 100%);
+  color: #d4956a;
+}
+
+.bp_style2 {
+  background: linear-gradient(145deg, rgba(199, 201, 204, 0.4) 0%, rgba(107, 109, 112, 0.4) 100%);
+  color: #c7c9cc;
+}
+
+.bp_style3 {
+  background: linear-gradient(145deg, rgba(230, 110, 80, 0.4) 0%, rgba(160, 50, 40, 0.4) 100%);
+  color: #ffb3a0;
+}
+
+.bp_style4 {
+  background: linear-gradient(145deg, rgba(232, 197, 90, 0.45) 0%, rgba(154, 118, 36, 0.45) 100%);
+  color: var(--cost-5);
+}
+
+.bp_style5 {
+  background: linear-gradient(145deg, rgba(255, 122, 224, 0.4) 0%, rgba(122, 210, 255, 0.4) 50%, rgba(255, 242, 122, 0.4) 100%);
+  color: #f0f0fa;
+}
+
+.bp_style6 {
+  background: linear-gradient(145deg, rgba(0, 212, 255, 0.3) 0%, rgba(0, 104, 120, 0.3) 100%);
+  color: #00d4ff;
+}
+
+:global([data-theme="light"]) .bp_style1 {
+  border-color: rgba(124, 45, 18, 0.42);
+  background: rgba(180, 83, 9, 0.14);
+  color: #7c2d12;
+}
+
+:global([data-theme="light"]) .bp_style2 {
+  border-color: rgba(75, 85, 99, 0.42);
+  background: rgba(75, 85, 99, 0.14);
+  color: #374151;
+}
+
+:global([data-theme="light"]) .bp_style3 {
+  border-color: rgba(153, 27, 27, 0.42);
+  background: rgba(220, 38, 38, 0.12);
+  color: #991b1b;
+}
+
+:global([data-theme="light"]) .bp_style4 {
+  border-color: rgba(146, 64, 14, 0.46);
+  background: rgba(217, 119, 6, 0.16);
+  color: #92400e;
+}
+
+:global([data-theme="light"]) .bp_style5 {
+  border-color: rgba(76, 29, 149, 0.36);
+  background: linear-gradient(145deg, rgba(236, 72, 153, 0.14), rgba(14, 165, 233, 0.14), rgba(234, 179, 8, 0.12));
+  color: #4c1d95;
+}
+
+:global([data-theme="light"]) .bp_style6 {
+  border-color: rgba(14, 116, 144, 0.42);
+  background: rgba(8, 145, 178, 0.12);
+  color: #0e7490;
+}
+
+/* ── Shared preamble (renders above tier rows) ──────────── */
+.preamble {
+  margin: 0 0 10px;
+  font-family: 'D-DIN', Arial, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  text-transform: none;
+  color: var(--text-primary);
+}
+
+/* ── Description rows ───────────────────────────────────── */
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.row {
+  margin: 0;
+  font-family: 'D-DIN', Arial, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  text-transform: none;
+}
+
+.rowActive {
+  color: var(--text-primary);
+}
+
+.rowInactive {
+  color: var(--text-muted);
+}
+
+.rowPrefix {
+  font-family: 'D-DIN-Bold', 'D-DIN', Arial, sans-serif;
+  font-weight: 700;
+  color: inherit;
+  margin-right: 2px;
+}
+
+.buffName {
+  font-family: 'D-DIN-Bold', 'D-DIN', Arial, sans-serif;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── Rules footer (italic muted) ────────────────────────── */
+.rules {
+  margin: 0 0 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--bg-border-muted);
+  font-family: 'D-DIN', Arial, sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  font-style: italic;
+  text-transform: none;
+  color: var(--text-muted);
+}
+
+/* ── Champion list (footer) ─────────────────────────────── */
+.champions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-top: 1px solid var(--bg-border-muted);
+  padding-top: 10px;
+}
+
+.champRing {
+  width: 32px;
+  height: 32px;
+  border: 2px solid;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.champPortrait {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}

@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(git mv *)",
+      "Bash(npx vite *)",
+      "Bash(node --check services/compsAggregator.js)",
+      "Bash(node --check db/aggregatedCompsRepo.js)",
+      "Bash(node --check db/mongo.js)",
+      "Bash(node --check routes/comps.js)",
+      "Bash(node --check index.js)",
+      "Bash(node -e ' *)",
+      "Bash(node server/services/compsAggregator.smoke.mjs)",
+      "WebFetch(domain:api.anthropic.com)",
+      "Bash(cp \"/c/Users/Kurtis/.claude/projects/c--Users-Kurtis-Desktop-web-dev-DoubleUpV2/73f440e9-4cf8-4c8c-b777-e0e829f631f4/tool-results/webfetch-1777659831479-isrxr7.bin\" /tmp/design/bundle.gz)",
+      "Read(//tmp/design/**)",
+      "Read(//tmp/**)",
+      "Bash(gunzip -k bundle.gz)",
+      "Bash(mkdir -p extracted)",
+      "Bash(tar -xf bundle -C extracted)",
+      "WebSearch",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Kurtis\\\\Desktop\\\\web dev\\\\DoubleUpV2\" -Recurse -Directory)",
+      "Bash(Select-Object FullName)"
+    ]
+  }
+}

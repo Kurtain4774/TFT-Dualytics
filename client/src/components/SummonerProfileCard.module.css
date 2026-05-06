@@ -1,0 +1,199 @@
+.card {
+  width: 100%;
+  border: 1px solid var(--bg-border);
+  padding: 14px 24px;
+  margin-bottom: 6px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 60px;
+}
+
+/* ── Summoner identity ───────────────────────────────── */
+.identityGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.identity {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+}
+
+.name {
+  font-family: "D-DIN-Bold", "D-DIN", Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.04em;
+}
+
+.tag {
+  font-family: "D-DIN", Arial, sans-serif;
+  font-size: 14px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* ── Vertical divider ────────────────────────────────── */
+.refreshButton {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--ghost-border);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-family: "D-DIN-Bold", "D-DIN", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.17px;
+  line-height: 1;
+  min-height: 32px;
+  padding: 0 16px;
+  text-transform: uppercase;
+  transition:
+    border-color var(--t-fast),
+    color var(--t-fast),
+    opacity var(--t-fast);
+}
+
+.refreshButton:hover:not(:disabled),
+.refreshButton:focus-visible {
+  border-color: var(--bg-border-bright);
+  color: var(--accent-gold);
+  outline: none;
+}
+
+.refreshButton:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.divider {
+  width: 1px;
+  height: 28px;
+  background: var(--bg-border);
+  flex-shrink: 0;
+}
+
+/* ── Rank block ──────────────────────────────────────── */
+.rankBlock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.rankIcon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.rankText {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.tierLabel {
+  font-family: "D-DIN-Bold", "D-DIN", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.06em;
+}
+
+.lpLabel {
+  font-size: 12px;
+  color: var(--text-secondary);
+  letter-spacing: 0.06em;
+}
+
+/* ── Standing (rank + percentile) ───────────────────── */
+.standing {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.rankPosition {
+  font-family: "D-DIN-Bold", "D-DIN", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.06em;
+}
+
+.percentile {
+  font-size: 13px;
+  color: var(--accent-gold);
+  letter-spacing: 0.06em;
+}
+
+.unranked {
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.bookmarkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 12px;
+  background: transparent;
+  border: 1px solid var(--bg-border);
+  color: var(--text-primary);
+  font-family: "D-DIN-Bold", "D-DIN", Arial, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.bookmarkBtn:hover {
+  border-color: var(--focus-border);
+  background: var(--bg-hover);
+}
+
+.bookmarkBtnActive {
+  border-color: var(--focus-border);
+  background: var(--bg-hover);
+}
+
+@media (max-width: 760px) {
+  .card {
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    gap: 10px;
+    min-height: 0;
+  }
+
+  .name {
+    font-size: 16px;
+  }
+
+  .identityGroup {
+    flex-wrap: wrap;
+  }
+
+  .refreshButton {
+    min-height: 30px;
+    padding: 0 12px;
+  }
+
+  .rankIcon {
+    width: 28px;
+    height: 28px;
+  }
+
+}

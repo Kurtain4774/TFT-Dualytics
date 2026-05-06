@@ -1,0 +1,130 @@
+.card {
+  width: 100%;
+  border: 1px solid var(--bg-border);
+  padding: 24px;
+  margin-bottom: 12px;
+  background: transparent;
+}
+
+/* ── Stats row ───────────────────────────────────────── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 0;
+  border-bottom: 1px solid var(--bg-border);
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 12px;
+  border-right: 1px solid var(--bg-border);
+}
+
+.statItem:first-child {
+  padding-left: 0;
+}
+
+.statItem:last-child {
+  border-right: none;
+}
+
+.statLabel {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.statValue {
+  font-family: "D-DIN-Bold", "D-DIN", Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+/* ── Charts row ──────────────────────────────────────── */
+.chartsRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.chartWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chartHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.chartTitle {
+  font-family: "D-DIN-Bold", "D-DIN", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 1.2px;
+}
+
+.chartSub {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.8px;
+}
+
+.chartEmpty {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  border: 1px solid var(--bg-border);
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .statsGrid {
+    grid-template-columns: repeat(5, 1fr);
+    row-gap: 16px;
+  }
+
+  .statItem:nth-child(5) {
+    border-right: none;
+  }
+
+  .statItem:nth-child(n + 6) {
+    border-top: 1px solid var(--bg-border);
+    padding-top: 16px;
+  }
+}
+
+@media (max-width: 860px) {
+  .chartsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .statItem:nth-child(3n) {
+    border-right: none;
+  }
+
+  .card {
+    padding: 16px;
+  }
+}

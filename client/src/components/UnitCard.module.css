@@ -1,0 +1,140 @@
+.card {
+  width: 280px;
+  background: var(--bg-card);
+  border: 1px solid var(--ghost-border);
+  padding: 14px;
+  pointer-events: none;
+}
+
+.header {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.portrait {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border: 2px solid;
+  flex-shrink: 0;
+}
+
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.name {
+  font-family: 'D-DIN-Bold', 'D-DIN', Arial, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 1.17px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.traitTag {
+  font-family: 'D-DIN', Arial, sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  border: 1px solid var(--ghost-border);
+  padding: 2px 5px;
+}
+
+.manaSection {
+  border-top: 1px solid var(--bg-border-muted);
+  padding-top: 8px;
+  margin-bottom: 8px;
+}
+
+.manaLabel {
+  font-family: 'D-DIN', Arial, sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.manaTrack {
+  height: 3px;
+  background: var(--ghost-surface);
+  width: 100%;
+}
+
+.manaFill {
+  height: 100%;
+  background: var(--accent-cyan, #00bfff);
+}
+
+.ability {
+  border-top: 1px solid var(--bg-border-muted);
+  padding-top: 8px;
+}
+
+.abilityHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.abilityIcon {
+  width: 22px;
+  height: 22px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.abilityName {
+  font-family: 'D-DIN-Bold', 'D-DIN', Arial, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.abilityDesc {
+  font-family: 'D-DIN', Arial, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.scaling {
+  color: var(--cost-5);
+  font-weight: 700;
+  font-style: normal;
+}
+
+.opPlus {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.buffName {
+  font-weight: 700;
+  background: linear-gradient(90deg, #ff7ae0 0%, #7ad2ff 50%, #fff27a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}

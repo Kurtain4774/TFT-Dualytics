@@ -1,0 +1,38 @@
+.hex {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: var(--ghost-border);
+  transition: background 0.2s ease;
+}
+
+.hexFill {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: var(--bg-base);
+  z-index: 0;
+}
+
+.over {
+  background: var(--focus-border);
+  z-index: 10;
+}
+
+.over .hexFill {
+  background: var(--bg-card);
+}
+
+.content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}

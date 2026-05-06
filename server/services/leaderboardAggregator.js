@@ -1,0 +1,139 @@
+import { riotRequest, getMassRegion, getPlatformRegion } from './riotApi.js'
+import { replaceLeaderboard } from '../db/leaderboardRepo.js'
+
+const QUEUE = 'RANKED_TFT_DOUBLE_UP'
+const TARGET = 300
+const DIVISIONS = ['I', 'II', 'III', 'IV']
+const PAGED_TIERS = ['DIAMOND', 'EMERALD', 'PLATINUM', 'GOLD']
+
+const inFlight = new Map()
+
+function platformHost(platform) {
+  return `https://${platform}.api.riotgames.com`
+}
+
+function regionalHost(mass) {
+  return `https://${mass}.api.riotgames.com`
+}
+
+async function fetchApexTier(platform, tier) {
+  const url = `${platformHost(platform)}/tft/league/v1/${tier}?queue=${QUEUE}`
+  const data = await riotRequest(url)
+  const tierName = tier === 'challenger' ? 'CHALLENGER' : tier === 'grandmaster' ? 'GRANDMASTER' : 'MASTER'
+  return (data?.entries || [])
+    .map(e => ({
+      puuid: e.puuid,
+      tier: tierName,
+      division: 'I',
+      lp: e.leaguePoints ?? 0,
+      wins: e.wins ?? 0,
+      losses: e.losses ?? 0,
+    }))
+    .sort((a, b) => b.lp - a.lp)
+}
+
+async function fetchPagedDivision(platform, tier, division) {
+  const out = []
+  for (let page = 1; page < 50; page++) {
+    const url = `${platformHost(platform)}/tft/league/v1/entries/${tier}/${division}?queue=${QUEUE}&page=${page}`
+    const data = await riotRequest(url)
+    if (!Array.isArray(data) || data.length === 0) break
+    for (const e of data) {
+      out.push({
+        puuid: e.puuid,
+        tier,
+        division,
+        lp: e.leaguePoints ?? 0,
+        wins: e.wins ?? 0,
+        losses: e.losses ?? 0,
+      })
+    }
+    if (data.length < 200) break
+  }
+  return out.sort((a, b) => b.lp - a.lp)
+}
+
+async function resolveAccount(massRegion, puuid) {
+  const url = `${regionalHost(massRegion)}/riot/account/v1/accounts/by-puuid/${puuid}`
+  try {
+    const data = await riotRequest(url)
+    return { gameName: data?.gameName || null, tagLine: data?.tagLine || null }
+  } catch (err) {
+    return { gameName: null, tagLine: null }
+  }
+}
+
+export async function runLeaderboardAggregation(regionInput) {
+  const platform = getPlatformRegion(regionInput)
+  const mass = getMassRegion(platform)
+
+  if (inFlight.has(platform)) return inFlight.get(platform)
+
+  const job = (async () => {
+    console.log(`[leaderboard] starting refresh for ${platform}`)
+    const collected = []
+
+    for (const apex of ['challenger', 'grandmaster', 'master']) {
+      if (collected.length >= TARGET) break
+      try {
+        const entries = await fetchApexTier(platform, apex)
+        console.log(`[leaderboard] ${platform} ${apex}: ${entries.length} entries (running total ${collected.length + entries.length})`)
+        collected.push(...entries)
+      } catch (err) {
+        console.error(`[leaderboard] ${platform} ${apex} fetch failed:`, err.response?.status || '', err.message)
+      }
+    }
+
+    outer: for (const tier of PAGED_TIERS) {
+      for (const div of DIVISIONS) {
+        if (collected.length >= TARGET) break outer
+        try {
+          const entries = await fetchPagedDivision(platform, tier, div)
+          console.log(`[leaderboard] ${platform} ${tier} ${div}: ${entries.length} entries (running total ${collected.length + entries.length})`)
+          collected.push(...entries)
+        } catch (err) {
+          console.error(`[leaderboard] ${platform} ${tier} ${div} fetch failed:`, err.response?.status || '', err.message)
+        }
+      }
+    }
+    console.log(`[leaderboard] ${platform} aggregation finished collecting: ${collected.length} total entries`)
+
+    const top = collected.slice(0, TARGET)
+
+    if (top.length === 0) {
+      console.warn(`[leaderboard] ${platform} aggregation collected 0 entries — Riot API may have no Double Up data for this region. Skipping DB write so a retry can occur.`)
+      return []
+    }
+
+    const accounts = await Promise.all(top.map(e => resolveAccount(mass, e.puuid)))
+    const entries = top.map((e, i) => ({
+      rank: i + 1,
+      puuid: e.puuid,
+      gameName: accounts[i].gameName,
+      tagLine: accounts[i].tagLine,
+      tier: e.tier,
+      division: e.division,
+      lp: e.lp,
+      wins: e.wins,
+      losses: e.losses,
+    }))
+
+    await replaceLeaderboard(platform, entries)
+    console.log(`[leaderboard] ${platform} refreshed with ${entries.length} entries`)
+    return entries
+  })()
+    .catch(err => {
+      console.error(`[leaderboard] ${platform} refresh failed:`, err.message)
+      return null
+    })
+    .finally(() => {
+      inFlight.delete(platform)
+    })
+
+  inFlight.set(platform, job)
+  return job
+}
+
+export function isRefreshing(regionInput) {
+  return inFlight.has(getPlatformRegion(regionInput))
+}

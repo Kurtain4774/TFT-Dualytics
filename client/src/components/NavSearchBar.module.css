@@ -1,0 +1,103 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.inner {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.select,
+.input {
+  background-color: var(--bg-base);
+  border: 1px solid var(--bg-border);
+  color: var(--text-primary);
+  border-radius: 0;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  outline: none;
+  min-height: 38px;
+  transition:
+    border-color 180ms ease,
+    box-shadow 220ms ease;
+}
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: var(--select-caret-down);
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px 7px;
+  padding: 0 28px 0 10px;
+  cursor: pointer;
+  min-width: 62px;
+  font-weight: 500;
+}
+
+.select:focus {
+  border-color: var(--focus-border);
+  background-image: var(--select-caret-up);
+}
+
+.inputWrap {
+  position: relative;
+  width: 180px;
+}
+
+.input {
+  width: 100%;
+  padding: 0 36px 0 10px;
+}
+
+.input:focus {
+  border-color: var(--focus-border);
+  box-shadow:
+    0 0 0 1px var(--focus-ring),
+    0 0 12px var(--focus-glow);
+}
+
+.btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 38px;
+  min-height: 38px;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  color: var(--text-primary);
+}
+
+.btn:disabled {
+  cursor: wait;
+}
+
+.error {
+  font-family: "D-DIN", Arial, sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-red);
+  margin: 4px 0 0;
+  white-space: nowrap;
+}
+
+@media (pointer: coarse) {
+  .select,
+  .input,
+  .btn {
+    min-height: 44px;
+  }
+
+  .btn {
+    width: 44px;
+  }
+}

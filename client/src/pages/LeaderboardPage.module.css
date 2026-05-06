@@ -1,0 +1,356 @@
+.page {
+  min-height: 100vh;
+  background: var(--bg-base);
+}
+
+.main {
+  padding: 2rem 2rem 4rem;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.title {
+  font-family: 'D-DIN-Bold', 'Barlow Condensed', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.regionBar {
+  margin-top: 24px;
+  margin-bottom: 32px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--bg-border-muted);
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.regionPill {
+  min-height: 44px;
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--bg-border-muted);
+  color: var(--text-secondary);
+  border-radius: 0;
+  font-family: 'D-DIN-Bold', 'Barlow Condensed', sans-serif;
+  font-size: 0.81rem;
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: 1.17px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.regionPill:hover {
+  color: var(--text-primary);
+}
+
+.regionPillActive {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.tableWrap {
+  border: 1px solid var(--bg-border);
+  padding: 0;
+}
+
+.scroller {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.th {
+  padding: 12px 10px;
+  font-family: 'D-DIN-Bold', 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.17px;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--bg-border);
+  border-right: 1px solid var(--bg-border-muted);
+  text-transform: uppercase;
+  transition: color 150ms ease;
+}
+
+.th:last-child {
+  border-right: none;
+}
+
+.thActive {
+  color: var(--text-primary);
+}
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: inherit;
+  gap: 4px;
+  width: 100%;
+  min-height: 32px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+}
+
+.sortArrow {
+  margin-left: 4px;
+  font-size: 0.6rem;
+}
+
+.row {
+  transition: background 150ms ease;
+}
+
+.rowEven {
+  background: var(--bg-row-even);
+}
+
+.rowOdd {
+  background: var(--bg-row-odd);
+}
+
+.row:hover {
+  background: var(--bg-hover);
+}
+
+.td {
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--bg-border-muted);
+  border-right: 1px solid var(--bg-border-muted);
+}
+
+.td:last-child {
+  border-right: none;
+}
+
+.rowHeader {
+  background: inherit;
+  font-weight: inherit;
+  text-align: left;
+}
+
+.tdRank {
+  text-align: center;
+  color: var(--text-muted);
+  font-family: 'D-DIN-Bold', 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.81rem;
+}
+
+.playerName {
+  font-family: 'D-DIN-Bold', 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.81rem;
+  color: var(--text-primary);
+  letter-spacing: 0.06em;
+}
+
+.playerTag {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin-left: 4px;
+  letter-spacing: 0.04em;
+}
+
+.playerLink {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  min-height: 44px;
+  text-decoration: none;
+}
+
+.playerLink:hover .playerName {
+  text-decoration: underline;
+}
+
+.tierBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tierLabel {
+  font-family: 'D-DIN-Bold', 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.81rem;
+  letter-spacing: 0.06em;
+}
+
+.lpValue {
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.tdNum {
+  text-align: right;
+  font-size: 0.81rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+}
+
+.tdRate {
+  text-align: right;
+  font-family: 'D-DIN-Bold', 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.81rem;
+  color: var(--text-secondary);
+}
+
+.rateGold {
+  color: var(--accent-gold);
+}
+
+.rateLabel {
+  display: inline-block;
+  margin-left: 6px;
+  color: var(--text-muted);
+  font-family: 'D-DIN', 'Barlow Condensed', sans-serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 12px;
+  border-top: 1px solid var(--bg-border);
+}
+
+.paginationInfo {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.paginationButtons {
+  display: flex;
+}
+
+.pageBtn {
+  min-height: 44px;
+  padding: 6px 14px;
+  background: var(--ghost-surface);
+  border: 1px solid var(--ghost-border);
+  color: var(--text-primary);
+  font-family: 'D-DIN-Bold', 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.pageBtn:disabled {
+  color: var(--text-muted);
+  cursor: default;
+  opacity: 0.4;
+}
+
+.pageNum {
+  width: 48px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--bg-border-muted);
+  color: var(--text-muted);
+  font-family: 'D-DIN-Bold', 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.pageNumActive {
+  background: var(--bg-hover);
+  border-color: var(--bg-border);
+  color: var(--text-primary);
+}
+
+.placeholder {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-family: 'D-DIN-Bold', 'Barlow Condensed', sans-serif;
+  font-size: 0.81rem;
+  letter-spacing: 1.17px;
+  text-transform: uppercase;
+}
+
+.metaLine {
+  margin-top: 12px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 760px) {
+  .main {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .title {
+    font-size: 2.2rem;
+    overflow-wrap: anywhere;
+  }
+
+  .pagination {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .paginationButtons {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 420px) {
+  .main {
+    padding-inline: 10px;
+  }
+
+  .regionPill {
+    flex: 1 1 72px;
+    border-bottom: 1px solid var(--bg-border-muted);
+  }
+
+  .table {
+    min-width: 700px;
+  }
+
+  .rateLabel {
+    display: block;
+    margin-left: 0;
+    margin-top: 2px;
+  }
+}

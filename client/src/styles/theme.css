@@ -1,0 +1,212 @@
+/* Color palette tokens — see globals.css for :root definitions */
+/* ──────────────────────────────────────────────────────────
+   SpaceX-inspired design system: THEME VARIABLES
+   ────────────────────────────────────────────────────────── */
+
+/* Dark theme — default. Also applied to :root for no-JS / flash prevention */
+:root,
+[data-theme="dark"] {
+  /* ── Backgrounds — pure black void ────────────────────── */
+  --bg-base:           #000000;
+  --bg-elevated:       #333333;
+  --bg-card:           #1c1c1c;
+  --bg-card-hover:     rgba(255, 255, 255, 0.16);
+  --bg-hover:          rgba(255, 255, 255, 0.16);
+  --bg-border:         rgba(255, 255, 255, 0.45);
+  --bg-border-muted:   rgba(255, 255, 255, 0.35);
+  --bg-border-bright:  rgba(255, 255, 255, 0.65);
+  --bg-input:          #000000;
+  --bg-input-focus:    rgba(255, 255, 255, 0.02);
+  --bg-row-odd:        rgba(255, 255, 255, 0.06);
+  --bg-row-even:       rgba(255, 255, 255, 0.025);
+  --bg-overlay:        rgba(0, 0, 0, 0.75);
+  --bg-overlay-strong: rgba(0, 0, 0, 0.85);
+  --bg-nav-glass:      rgba(8, 12, 20, 0.45);
+  --bg-scrim:          rgba(0, 0, 0, 0.55);
+  --bg-hero-sign:      #000000;
+  --bg-shine:          rgba(255, 255, 255, 0.06);
+  --landing-card-hover: rgba(255, 255, 255, 0.04);
+  --landing-card-shine: rgba(255, 255, 255, 0.06);
+  --unit-label-bg:     rgba(0, 0, 0, 0.72);
+  --unit-label-text:   #fafaff;
+  --icon-tile-bg:      #1c1c1c;
+  --select-caret-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23fafaff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  --select-caret-up:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 7l5-5 5 5' stroke='%23fafaff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+
+  /* ── Text — brighter spectral white ─ */
+  --text-primary:      rgba(250, 250, 255, 1);
+  --text-secondary:    rgba(250, 250, 255, 0.78);
+  --text-muted:        rgba(250, 250, 255, 0.5);
+  --text-inverse:      #000000;
+  --text-link-hover:   #ffffff;
+  --text-hero-sign:    #fafaff;
+  --text-on-accent:    #ffffff;
+
+  /* ── Accents — monochrome only ── */
+  --accent-gold:       #f5c542;
+  --accent-gold-glow:  rgba(245, 197, 66, 0.25);
+  --accent-cyan:       #22d3ee;
+  --accent-cyan-glow:  rgba(34, 211, 238, 0.25);
+  --accent-red:        #ef4444;
+  --accent-red-glow:   rgba(239, 68, 68, 0.25);
+  --accent-green:      #22c55e;
+  --accent-green-glow: rgba(34, 197, 94, 0.25);
+
+  /* ── Placement tiers ── */
+  --placement-1:       #f5c542;
+  --placement-1-glow:  rgba(245, 197, 66, 0.25);
+  --placement-2:       #e5e7eb;
+  --placement-2-glow:  rgba(229, 231, 235, 0.3);
+  --placement-3:       #cd7f32;
+  --placement-3-glow:  rgba(205, 127, 50, 0.2);
+  --placement-4:       #64748b;
+  --placement-4-glow:  rgba(100, 116, 139, 0.15);
+
+  /* ── Champion cost ── */
+  --cost-1:            rgb(172, 172, 172);
+  --cost-2:            rgb(34, 197, 94);
+  --cost-3:            rgb(0, 144, 255);
+  --cost-4:            rgb(168, 85, 247);
+  --cost-5:            rgb(234, 179, 8);
+
+  --cost-1-glow:       rgb(220, 220, 220);
+  --cost-2-glow:       rgb(74, 222, 128);
+  --cost-3-glow:       rgb(56, 189, 248);
+  --cost-4-glow:       rgb(196, 181, 253);
+  --cost-5-glow:       rgb(253, 224, 71);
+
+  --bronze-star-level: rgb(205, 127, 50);
+  --silver-star-level: rgb(209, 213, 219);
+  --gold-star-level:   rgb(234, 179, 8);
+
+  /* ── Ghost surface ── */
+  --ghost-surface:     rgba(240, 240, 250, 0.10);
+  --ghost-border:      rgba(240, 240, 250, 0.35);
+  --overlay-dark:      rgba(0, 0, 0, 0.5);
+  --focus-border:      rgba(255, 255, 255, 0.95);
+  --focus-ring:        rgba(255, 255, 255, 0.20);
+  --focus-glow:        rgba(255, 255, 255, 0.18);
+  --shadow-elevated:   rgba(0, 0, 0, 0.35);
+  --scrollbar-thumb:   rgba(240, 240, 250, 0.15);
+  --scrollbar-hover:   rgba(240, 240, 250, 0.35);
+
+  /* ── Transitions ── */
+  --t-fast:            150ms ease;
+  --t-normal:          220ms ease;
+  --t-slow:            350ms ease;
+
+  /* ── Chart tokens (read by JS via getComputedStyle) ── */
+  --chart-axis-color:    rgba(240, 240, 250, 0.45);
+  --chart-grid-color:    rgba(240, 240, 250, 0.07);
+  --chart-tooltip-bg:    #0a0a0a;
+  --chart-tooltip-text:  #f0f0fa;
+  --chart-tooltip-border: rgba(240, 240, 250, 0.15);
+  --chart-line-color:    #f0f0fa;
+  --chart-cursor-color:  rgba(240, 240, 250, 0.15);
+
+  /* ── Select option bg (for globals.css) ── */
+  --select-option-bg:  #000000;
+}
+
+[data-theme="light"] {
+  /* ── Backgrounds ── */
+  --bg-base:           #f0f2f5;
+  --bg-elevated:       #d8dce5;
+  --bg-card:           #ffffff;
+  --bg-card-hover:     rgba(0, 0, 0, 0.06);
+  --bg-hover:          rgba(0, 0, 0, 0.06);
+  --bg-border:         rgba(0, 0, 0, 0.25);
+  --bg-border-muted:   rgba(0, 0, 0, 0.18);
+  --bg-border-bright:  rgba(0, 0, 0, 0.45);
+  --bg-input:          #ffffff;
+  --bg-input-focus:    rgba(0, 0, 0, 0.02);
+  --bg-row-odd:        rgba(0, 0, 0, 0.035);
+  --bg-row-even:       rgba(0, 0, 0, 0.012);
+  --bg-overlay:        rgba(10, 15, 25, 0.38);
+  --bg-overlay-strong: rgba(10, 15, 25, 0.52);
+  --bg-nav-glass:      rgba(255, 255, 255, 0.72);
+  --bg-scrim:          rgba(10, 15, 25, 0.38);
+  --bg-hero-sign:      #ffffff;
+  --bg-shine:          rgba(0, 0, 0, 0.05);
+  --landing-card-hover: rgba(255, 255, 255, 0.82);
+  --landing-card-shine: rgba(255, 255, 255, 0.92);
+  --unit-label-bg:     rgba(255, 255, 255, 0.78);
+  --unit-label-text:   rgba(10, 10, 20, 1);
+  --icon-tile-bg:      rgba(10, 10, 20, 0.82);
+  --select-caret-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230a0a14' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  --select-caret-up:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 7l5-5 5 5' stroke='%230a0a14' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+
+  /* ── Text ── */
+  --text-primary:      rgba(10, 10, 20, 1);
+  --text-secondary:    rgba(10, 10, 20, 0.72);
+  --text-muted:        rgba(10, 10, 20, 0.48);
+  --text-inverse:      #ffffff;
+  --text-link-hover:   rgba(10, 10, 20, 1);
+  --text-hero-sign:    rgba(10, 10, 20, 1);
+  --text-on-accent:    #ffffff;
+
+  /* ── Accents — darkened for contrast on white ── */
+  --accent-gold:       #b8860b;
+  --accent-gold-glow:  rgba(184, 134, 11, 0.20);
+  --accent-cyan:       #0891b2;
+  --accent-cyan-glow:  rgba(8, 145, 178, 0.20);
+  --accent-red:        #dc2626;
+  --accent-red-glow:   rgba(220, 38, 38, 0.15);
+  --accent-green:      #16a34a;
+  --accent-green-glow: rgba(22, 163, 74, 0.15);
+
+  /* ── Placement tiers ── */
+  --placement-1:       #b8860b;
+  --placement-1-glow:  rgba(184, 134, 11, 0.20);
+  --placement-2:       #6b7280;
+  --placement-2-glow:  rgba(107, 114, 128, 0.20);
+  --placement-3:       #92400e;
+  --placement-3-glow:  rgba(146, 64, 14, 0.15);
+  --placement-4:       #94a3b8;
+  --placement-4-glow:  rgba(148, 163, 184, 0.10);
+
+  /* ── Champion cost — darkened for contrast on white ── */
+  --cost-1:            rgb(100, 100, 100);
+  --cost-2:            rgb(22, 163, 74);
+  --cost-3:            rgb(29, 78, 216);
+  --cost-4:            rgb(124, 58, 237);
+  --cost-5:            rgb(161, 98, 7);
+
+  --cost-1-glow:       rgb(130, 130, 130);
+  --cost-2-glow:       rgb(34, 197, 94);
+  --cost-3-glow:       rgb(56, 189, 248);
+  --cost-4-glow:       rgb(167, 139, 250);
+  --cost-5-glow:       rgb(217, 119, 6);
+
+  --bronze-star-level: rgb(146, 64, 14);
+  --silver-star-level: rgb(107, 114, 128);
+  --gold-star-level:   rgb(161, 98, 7);
+
+  /* ── Ghost surface ── */
+  --ghost-surface:     rgba(10, 10, 20, 0.06);
+  --ghost-border:      rgba(10, 10, 20, 0.20);
+  --overlay-dark:      rgba(0, 0, 0, 0.45);
+  --focus-border:      rgba(10, 10, 20, 0.75);
+  --focus-ring:        rgba(10, 10, 20, 0.14);
+  --focus-glow:        rgba(10, 10, 20, 0.10);
+  --shadow-elevated:   rgba(10, 15, 25, 0.12);
+  --scrollbar-thumb:   rgba(10, 10, 20, 0.20);
+  --scrollbar-hover:   rgba(10, 10, 20, 0.36);
+
+  /* ── Transitions ── */
+  --t-fast:            150ms ease;
+  --t-normal:          220ms ease;
+  --t-slow:            350ms ease;
+
+  /* ── Chart tokens ── */
+  --chart-axis-color:    rgba(10, 10, 20, 0.45);
+  --chart-grid-color:    rgba(10, 10, 20, 0.08);
+  --chart-tooltip-bg:    #ffffff;
+  --chart-tooltip-text:  rgba(10, 10, 20, 1);
+  --chart-tooltip-border: rgba(10, 10, 20, 0.15);
+  --chart-line-color:    rgba(10, 10, 20, 0.85);
+  --chart-cursor-color:  rgba(10, 10, 20, 0.10);
+
+  /* ── Select option bg ── */
+  --select-option-bg:  #ffffff;
+}

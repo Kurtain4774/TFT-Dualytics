@@ -1,0 +1,114 @@
+.icon {
+  position: relative;
+  border-radius: 0.125rem;
+  overflow: hidden;
+  border: 2px solid;
+  flex-shrink: 0;
+  background: transparent;
+  transition:
+    transform var(--t-fast),
+    filter var(--t-fast);
+}
+
+.icon:hover {
+  transform: scale(1.04);
+  filter: brightness(1.05);
+  z-index: 1;
+}
+
+.icon:focus-visible,
+.hexBorder:focus-visible {
+  outline: 2px solid var(--focus-border);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px var(--focus-ring);
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(0.1) contrast(1.02);
+  
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+.stars {
+  display: flex;
+  justify-content: center;
+  gap: 1px;
+  line-height: 1;
+  height: 10px;
+}
+
+.star {
+  font-size: 9px;
+  color: var(--bronze-star-level);
+}
+
+.stars[data-tier="2"] .star {
+  color: var(--silver-star-level);
+}
+
+.stars[data-tier="3"] .star {
+  color: var(--gold-star-level);
+}
+
+.name {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: 'D-DIN', Arial, Verdana, sans-serif;
+  font-size: 0.63rem;
+  font-weight: 400;
+  line-height: 0.94;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: var(--unit-label-bg);
+  padding: 3px 2px 2px;
+  color: var(--unit-label-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hexBorder {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hexInner {
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  overflow: hidden;
+}
+
+.hexImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon:hover {
+    transform: none;
+  }
+}

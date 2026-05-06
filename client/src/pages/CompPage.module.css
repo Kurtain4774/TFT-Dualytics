@@ -1,0 +1,129 @@
+.page {
+  padding: 3rem 2rem 4rem;
+  max-width: 1240px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Hero title ─────────────────────────────────────────── */
+.title {
+  font-family: "D-DIN-Bold", "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-family: "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2.25rem;
+}
+
+.error {
+  color: var(--text-primary);
+  font-family: "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.81rem;
+  font-weight: 700;
+  letter-spacing: 1.17px;
+  text-transform: uppercase;
+  margin-bottom: 2.25rem;
+  padding: 12px 0;
+  border-top: 1px solid var(--bg-border);
+  border-bottom: 1px solid var(--bg-border);
+}
+
+/* ── Section heading ────────────────────────────────────── */
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 3rem;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--bg-border);
+}
+
+.sectionTitle {
+  font-family: "D-DIN-Bold", "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sectionMeta {
+  font-family: "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ── Comp list — single vertical stack ──────────────────── */
+.compList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+.emptySearch {
+  color: var(--text-muted);
+  font-family: "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 1.17px;
+  line-height: 1.5;
+  text-transform: uppercase;
+  margin-top: 18px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--bg-border-muted);
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 1.5rem 1rem 2rem;
+  }
+  .title {
+    font-size: 2rem;
+    overflow-wrap: anywhere;
+  }
+  .subtitle {
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+  }
+  .sectionHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-top: 2rem;
+  }
+
+  .sectionMeta {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 380px) {
+  .page {
+    padding-inline: 0.75rem;
+  }
+
+  .title {
+    font-size: 1.7rem;
+  }
+}

@@ -1,0 +1,90 @@
+.form {
+  margin-bottom: 2.25rem;
+  width: 100%;
+}
+
+.searchLine {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 1.2rem;
+  border: 1px solid var(--ghost-border);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 1.17px;
+  text-transform: uppercase;
+  outline: none;
+  transition:
+    border-color var(--t-fast),
+    background var(--t-fast);
+}
+
+.input:focus {
+  border-color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.clearButton {
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border: 1px solid var(--ghost-border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: "D-DIN-Bold", "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.17px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color var(--t-fast),
+    color var(--t-fast),
+    background var(--t-fast);
+}
+
+.clearButton:hover,
+.clearButton:focus-visible {
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.count {
+  color: var(--text-muted);
+  font-family: "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 1.17px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .searchLine {
+    flex-wrap: wrap;
+  }
+
+  .input {
+    flex-basis: 100%;
+  }
+
+  .count {
+    margin-left: auto;
+  }
+}

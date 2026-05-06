@@ -1,0 +1,134 @@
+import { useMemo } from 'react'
+import {
+  BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+} from 'recharts'
+import { lastRoundToStage } from '../utils/roundToStage.js'
+import { useSettings } from '../contexts/useSettings.js'
+import { useTranslation } from 'react-i18next'
+import styles from './SummonerStatsCard.module.css'
+
+const PLACEMENT_COLORS = ['#f5c542', '#e5e7eb', '#cd7f32', '#64748b']
+
+function avg(arr) {
+  return arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0
+}
+
+function pct(count, total) {
+  return total ? `${((count / total) * 100).toFixed(1)}%` : '-'
+}
+
+function computeStats(matches, champions) {
+  if (!matches.length) return null
+  const costMap = new Map(champions.map(c => [c.id, c.cost ?? 0]))
+  const total = matches.length
+  const allUnits = matches.flatMap(m => m.units)
+  return {
+    gamesPlayed: total,
+    avgPlacement: avg(matches.map(m => m.teamPlacement)).toFixed(2),
+    avgDamage: Math.round(avg(matches.map(m => m.totalDamageToPlayers))).toLocaleString(),
+    top2Rate: pct(matches.filter(m => m.teamPlacement <= 2).length, total),
+    winRate: pct(matches.filter(m => m.teamPlacement === 1).length, total),
+    avgLevel: avg(matches.map(m => m.level)).toFixed(1),
+    avgStarLevel: avg(allUnits.map(u => u.tier)).toFixed(2),
+    avgTeamCost: avg(allUnits.map(u => costMap.get(u.id) ?? 0)).toFixed(1),
+    avgEliminated: lastRoundToStage(Math.round(avg(matches.map(m => m.lastRound)))),
+  }
+}
+
+export default function SummonerStatsCard({ matches, resolvedChampions }) {
+  const { theme } = useSettings()
+  const { t } = useTranslation()
+
+  const STAT_DEFS = [
+    ['gamesPlayed', t('statsCard.gamesPlayed')],
+    ['avgPlacement', t('statsCard.avgPlacement')],
+    ['avgDamage', t('statsCard.avgDamage')],
+    ['top2Rate', t('statsCard.top2Rate')],
+    ['winRate', t('statsCard.winRate')],
+    ['avgLevel', t('statsCard.avgLevel')],
+    ['avgStarLevel', t('statsCard.avgStarLevel')],
+    ['avgTeamCost', t('statsCard.avgTeamCost')],
+    ['avgEliminated', t('statsCard.avgEliminated')],
+  ]
+
+  const cs = getComputedStyle(document.documentElement)
+  const axisColor = cs.getPropertyValue('--chart-axis-color').trim()
+  const gridColor = cs.getPropertyValue('--chart-grid-color').trim()
+  const tooltipBg = cs.getPropertyValue('--chart-tooltip-bg').trim()
+  const tooltipText = cs.getPropertyValue('--chart-tooltip-text').trim()
+  const tooltipBorder = cs.getPropertyValue('--chart-tooltip-border').trim()
+
+  const AXIS_STYLE = {
+    fill: axisColor,
+    fontSize: 10,
+    fontFamily: 'D-DIN, Arial, sans-serif',
+    textTransform: 'uppercase',
+  }
+  const TOOLTIP_STYLE = {
+    background: tooltipBg,
+    border: `1px solid ${tooltipBorder}`,
+    borderRadius: 2,
+    fontSize: 11,
+    fontFamily: 'D-DIN, Arial, sans-serif',
+    textTransform: 'uppercase',
+    color: tooltipText,
+  }
+
+  const stats = useMemo(
+    () => computeStats(matches, resolvedChampions ?? []),
+    [matches, resolvedChampions],
+  )
+
+  const barData = useMemo(() => {
+    const recent = matches.slice(0, 20)
+    return [1, 2, 3, 4].map((p, i) => ({
+      label: [t('placement.1'), t('placement.2'), t('placement.3'), t('placement.4')][i],
+      count: recent.filter(m => m.teamPlacement === p).length,
+    }))
+  }, [matches, t])
+
+  if (!stats) return null
+
+  const chartCount = Math.min(matches.length, 20)
+
+  return (
+    <div className={styles.card}>
+      <div className={styles.statsGrid}>
+        {STAT_DEFS.map(([key, label]) => (
+          <div key={key} className={styles.statItem}>
+            <span className={styles.statLabel}>{label}</span>
+            <span className={styles.statValue}>{stats[key]}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className={styles.chartsRow}>
+        <div className={styles.chartWrap}>
+          <div className={styles.chartHeader}>
+            <span className={styles.chartTitle}>{t('statsCard.chartTitle')}</span>
+            <span className={styles.chartSub}>{t('statsCard.chartSub', { count: chartCount })}</span>
+          </div>
+          <ResponsiveContainer key={theme} width="100%" height={180}>
+            <BarChart data={barData} barCategoryGap="30%">
+              <CartesianGrid vertical={false} stroke={gridColor} />
+              <XAxis dataKey="label" tick={AXIS_STYLE} axisLine={false} tickLine={false} />
+              <YAxis allowDecimals={false} tick={AXIS_STYLE} axisLine={false} tickLine={false} width={24} />
+              <Tooltip
+                cursor={{ fill: 'rgba(240,240,250,0.04)' }}
+                contentStyle={TOOLTIP_STYLE}
+                labelStyle={{ color: tooltipText, textTransform: 'uppercase' }}
+                itemStyle={{ color: tooltipText }}
+                formatter={v => [v, t('statsCard.games')]}
+              />
+              <Bar dataKey="count" radius={[2, 2, 0, 0]}>
+                {barData.map((_, i) => (
+                  <Cell key={i} fill={PLACEMENT_COLORS[i]} fillOpacity={0.85} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  )
+}

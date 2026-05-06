@@ -1,0 +1,258 @@
+.card {
+  width: 100%;
+  border: 1px solid var(--bg-border);
+  padding: 20px 24px 0;
+  margin-bottom: 6px;
+  background: transparent;
+}
+
+/* ── Header ──────────────────────────────────────────── */
+.headerRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.titleWrapper {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  font-family: "D-DIN-Bold", "D-DIN", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 1.2px;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── Table wrapper — positioning context for absolute tip ── */
+.tableWrap {
+  position: relative;
+}
+
+/* ── Dismissible tip — inline next to title with downward arrow ── */
+.tip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #dddddd;
+  background: transparent;
+  padding: 6px 6px 6px 6px;
+  border: 1px solid var(--bg-border);
+  border-radius: 4px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(206, 206, 206, 0.3);
+  position: relative;
+}
+
+/* Speech-bubble tail pointing DOWN from the tip */
+.tip::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #f0f0fa;
+}
+
+.tipText {
+  font-size: 11px;
+  font-family: "D-DIN", Arial, sans-serif;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.tipClose {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ef4444;
+  font-size: 11px;
+  line-height: 1;
+  padding: 0 2px;
+  text-transform: none;
+  flex-shrink: 0;
+  transition: opacity 150ms ease;
+}
+
+/* ── Clear filter button ─────────────────────────────── */
+.clearBtn {
+  background: none;
+  border: 1px solid var(--bg-border-bright);
+  color: var(--text-muted);
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition:
+    border-color var(--t-fast),
+    color var(--t-fast);
+}
+
+.clearBtn:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+}
+
+/* ── Table ───────────────────────────────────────────── */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.headRow {
+  border-bottom: 1px solid var(--bg-border);
+}
+
+.th {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  padding: 0 12px 8px 0;
+  font-weight: 400;
+  text-align: left;
+}
+
+.th:first-child {
+  padding-left: 0;
+  width: 40%;
+}
+
+.th.num {
+  text-align: right;
+}
+
+.thIcon {
+  width: 28px;
+}
+
+/* ── Rows ────────────────────────────────────────────── */
+.row {
+  border-bottom: 1px solid var(--bg-border);
+  cursor: pointer;
+  transition: background var(--t-fast);
+  outline: none;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background: var(--bg-hover);
+}
+
+.row:hover .rowIcon {
+  opacity: 1;
+}
+
+.row:focus-visible {
+  outline: 1px solid var(--ghost-border);
+  outline-offset: -1px;
+}
+
+/* Active row — gold left border + subtle gold tint */
+.rowActive {
+  background: rgba(245, 197, 66, 0.06);
+  border-left: 2px solid var(--accent-gold);
+}
+
+.rowActive .playerName {
+  color: var(--accent-gold);
+}
+
+/* ── Cells ───────────────────────────────────────────── */
+.td {
+  font-size: 13px;
+  color: var(--text-primary);
+  padding: 10px 12px 10px 0;
+  vertical-align: middle;
+}
+
+.td:first-child {
+  padding-left: 8px;
+}
+
+.td.num {
+  text-align: right;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.tdIcon {
+  width: 28px;
+  text-align: center;
+  vertical-align: middle;
+  padding: 0;
+}
+
+/* ── Cell content ────────────────────────────────────── */
+.playerName {
+  font-family: "D-DIN-Bold", "D-DIN", Arial, sans-serif;
+  font-weight: 700;
+  color: var(--text-primary);
+  transition: color var(--t-fast);
+}
+
+.playerTag {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+
+.rowIcon {
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity var(--t-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rowActive .rowIcon {
+  color: var(--accent-gold);
+  opacity: 1;
+}
+
+@media (max-width: 760px) {
+  .card {
+    padding: 16px 16px 0;
+    overflow-x: auto;
+  }
+
+  .tableWrap {
+    overflow-x: auto;
+  }
+
+  .table {
+    min-width: 400px;
+  }
+
+  /* Stack tip on smaller screens */
+  .titleWrapper {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tip {
+    white-space: normal;
+  }
+}

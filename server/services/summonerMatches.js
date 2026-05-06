@@ -1,0 +1,438 @@
+import { riotRequest, getMassRegion, getPlatformRegion, getRateLimitStats } from './riotApi.js'
+import { normalizeMatch } from './matchNormalizers.js'
+import {
+  findPlayerByRiotId,
+  findPlayersByPuuids,
+  upsertPlayer,
+  addMatchIdsToPlayer,
+  updatePlayerRank,
+  markMatchHistorySynced,
+  upsertPartner,
+} from '../db/playerRepo.js'
+import {
+  findMatchesByPuuid,
+  filterKnownMatchIds,
+  getLatestMatchTimestamp,
+  upsertMatch,
+  buildMatchDocument,
+} from '../db/matchRepo.js'
+import {
+  findRankSnapshots,
+  recordRankSnapshotIfChanged,
+} from '../db/rankSnapshotsRepo.js'
+import { CURRENT_SET as DEFAULT_CURRENT_SET } from '../constants/game.js'
+
+const USER_PRIORITY = 10
+const CURRENT_SET = Number(process.env.CURRENT_SET || DEFAULT_CURRENT_SET)
+const SET_RELEASE = Number(process.env.CURRENT_SET_RELEASE_TIMESTAMP)
+const IDS_PAGE_SIZE = 100
+const MAX_PAGES = 50
+const SYNC_STATUS_TTL = 10 * 60 * 1000
+const SYNC_RESTART_DELAY = 60 * 1000
+const MATCH_SYNC_OVERLAP_SECONDS = 24 * 60 * 60
+
+const VALID_TAG_LINE = /^[a-zA-Z0-9]{2,5}$/
+const syncJobs = new Map()
+
+function syncKey(region, gameName, tagLine) {
+  return `${region?.toLowerCase() || 'na1'}:${gameName.trim().toLowerCase()}#${tagLine.trim().toLowerCase()}`
+}
+
+function touchSync(job, fields) {
+  if (!job) return
+  Object.assign(job, fields, { updatedAt: Date.now() })
+}
+
+function estimateSyncEtaSeconds(job) {
+  if (!job || job.state !== 'syncing') return 0
+  const stats = getRateLimitStats()
+  const remainingDetails = Math.max(0, (job.totalNewMatches ?? 0) - (job.processedNewMatches ?? 0))
+  const unknownWork = job.totalNewMatches == null ? 3 : 0
+  const remainingRequests = Math.max(1, remainingDetails + unknownWork + (job.phase === 'rank' ? 1 : 0))
+  const queuedRequests = stats.longQueueSize + stats.shortQueueSize + stats.longQueuePending + stats.shortQueuePending
+  return Math.max(10, Math.ceil(((queuedRequests + remainingRequests) / 50) * 60))
+}
+
+function publicSyncStatus(job) {
+  if (!job) {
+    return {
+      state: 'idle',
+      phase: 'idle',
+      message: 'USING STORED MATCH DATA',
+      etaSeconds: 0,
+      processedNewMatches: 0,
+      totalNewMatches: 0,
+    }
+  }
+
+  const status = {
+    state: job.state,
+    phase: job.phase,
+    message: job.message,
+    etaSeconds: estimateSyncEtaSeconds(job),
+    processedNewMatches: job.processedNewMatches ?? 0,
+    totalNewMatches: job.totalNewMatches ?? null,
+    matchIdsFound: job.matchIdsFound ?? null,
+    startedAt: job.startedAt,
+    updatedAt: job.updatedAt,
+    completedAt: job.completedAt ?? null,
+  }
+  if (job.error) status.error = job.error
+  return status
+}
+
+export function getPlayerSyncStatus(region, gameName, tagLine) {
+  return publicSyncStatus(syncJobs.get(syncKey(region, gameName, tagLine)))
+}
+
+export function validateRiotId(gameName, tagLine) {
+  if (!gameName || !tagLine) {
+    throw Object.assign(new Error('Riot ID requires gameName#tagLine'), { statusCode: 400 })
+  }
+  if (gameName.length < 3 || gameName.length > 16 || gameName.includes('#') || gameName.includes('/')) {
+    throw Object.assign(new Error('Invalid game name'), { statusCode: 400 })
+  }
+  if (!VALID_TAG_LINE.test(tagLine)) {
+    throw Object.assign(new Error('Invalid tag line'), { statusCode: 400 })
+  }
+}
+
+function rankInfoFromPlayer(dbPlayer) {
+  if (!dbPlayer?.tier) return null
+  return {
+    tier: dbPlayer.tier,
+    rank: dbPlayer.rank,
+    leaguePoints: dbPlayer.leaguePoints,
+    updatedAt: dbPlayer.rankUpdatedAt ?? null,
+  }
+}
+
+async function buildParticipantRanks(matches, rankInfo, puuid) {
+  const participantPuuids = matches.flatMap(match =>
+    (match.allParticipants || []).map(participant => participant.puuid)
+  )
+  const dbPlayers = await findPlayersByPuuids(participantPuuids).catch(() => [])
+  const participantRanks = {}
+
+  for (const player of dbPlayers) {
+    const info = rankInfoFromPlayer(player)
+    if (info) participantRanks[player.puuid] = info
+  }
+
+  if (puuid && rankInfo) participantRanks[puuid] = rankInfo
+  return participantRanks
+}
+
+async function buildStoredPlayerResponse(dbPlayer, gameName, tagLine) {
+  if (!dbPlayer?.puuid) return null
+  const matchDocs = await findMatchesByPuuid(dbPlayer.puuid, 0).catch(() => [])
+  const matches = matchDocs
+    .map(doc => normalizeMatch(doc, dbPlayer.puuid, CURRENT_SET))
+    .filter(Boolean)
+    .sort((a, b) => b.date - a.date)
+
+  const rankInfo = rankInfoFromPlayer(dbPlayer)
+  const rankSnapshots = await findRankSnapshots(dbPlayer.puuid).catch(() => [])
+
+  return {
+    summoner: {
+      gameName: dbPlayer.accountDetails?.gameName ?? gameName,
+      tagLine: dbPlayer.accountDetails?.tagLine ?? tagLine,
+      puuid: dbPlayer.puuid,
+    },
+    matches,
+    rankInfo,
+    rankSnapshots,
+    participantRanks: await buildParticipantRanks(matches, rankInfo, dbPlayer.puuid),
+    cache: {
+      source: 'mongo',
+      matchCount: matches.length,
+      lastMatchAt: matches[0]?.date ?? null,
+      lastUpdated: dbPlayer.matchHistorySyncedAt ?? null,
+    },
+  }
+}
+
+export async function getStoredPlayerMatches(gameName, tagLine) {
+  validateRiotId(gameName, tagLine)
+  const gameNameLower = gameName.trim().toLowerCase()
+  const tagLineLower = tagLine.trim().toLowerCase()
+  const dbPlayer = await findPlayerByRiotId(gameNameLower, tagLineLower).catch(() => null)
+  return buildStoredPlayerResponse(dbPlayer, gameName, tagLine)
+}
+
+// Paginate Riot's match-ids endpoint to collect all match IDs since startTimeSec.
+// Stops when a page returns fewer than IDS_PAGE_SIZE results (last page reached).
+async function paginateMatchIds(puuid, massRegion, startTimeSec, signal, syncJob = null) {
+  const allIds = []
+  for (let page = 0; page < MAX_PAGES; page++) {
+    touchSync(syncJob, {
+      phase: 'match-ids',
+      message: 'CHECKING RIOT FOR NEW MATCH IDS',
+      matchIdsFound: allIds.length,
+    })
+    const start = page * IDS_PAGE_SIZE
+    const url = `https://${massRegion}.api.riotgames.com/tft/match/v1/matches/by-puuid/${puuid}/ids?startTime=${startTimeSec}&start=${start}&count=${IDS_PAGE_SIZE}`
+    let ids
+    try {
+      ids = await riotRequest(url, USER_PRIORITY, signal)
+    } catch (err) {
+      if (err?.name === 'AbortError' || err?.code === 'ERR_CANCELED') throw err
+      console.error('[paginateMatchIds] failed while fetching match ids', err?.message)
+      throw err
+    }
+    if (!Array.isArray(ids) || ids.length === 0) break
+    allIds.push(...ids)
+    touchSync(syncJob, { matchIdsFound: allIds.length })
+    if (ids.length < IDS_PAGE_SIZE) break
+  }
+  return allIds
+}
+
+async function fetchRankInfo(puuid, region, signal) {
+  try {
+    const platform = getPlatformRegion(region)
+    const entries = await riotRequest(
+      `https://${platform}.api.riotgames.com/tft/league/v1/by-puuid/${puuid}`,
+      USER_PRIORITY,
+      signal
+    )
+    const list = Array.isArray(entries) ? entries : (entries ? [entries] : [])
+    const ranked = list.find(e => e.queueType === 'RANKED_TFT_DOUBLE_UP') || null
+    if (!ranked?.tier) {
+      updatePlayerRank(puuid, { tier: null, rank: null, leaguePoints: null }).catch(() => {})
+      return null
+    }
+    const result = {
+      tier: ranked.tier,
+      rank: ranked.rank,
+      leaguePoints: ranked.leaguePoints,
+      updatedAt: new Date(),
+    }
+    updatePlayerRank(puuid, { tier: ranked.tier, rank: ranked.rank, leaguePoints: ranked.leaguePoints }).catch(() => {})
+    recordRankSnapshotIfChanged(puuid, {
+      tier: ranked.tier,
+      rank: ranked.rank,
+      leaguePoints: ranked.leaguePoints,
+      recordedAt: result.updatedAt,
+    }).catch(() => {})
+    return result
+  } catch (err) {
+    if (err?.name === 'AbortError' || err?.code === 'ERR_CANCELED') throw err
+    console.error('[fetchRankInfo] failed for', puuid, err?.message)
+    return null
+  }
+}
+
+export async function getPlayerMatches(gameName, tagLine, region, signal, syncJob = null) {
+  validateRiotId(gameName, tagLine)
+  touchSync(syncJob, {
+    phase: 'resolving',
+    message: 'RESOLVING STORED PLAYER PROFILE',
+  })
+  const massRegion = getMassRegion(region)
+  const gameNameLower = gameName.trim().toLowerCase()
+  const tagLineLower = tagLine.trim().toLowerCase()
+
+  // 1. DB-first player lookup — skip Riot Account API if we already have the puuid
+  let dbPlayer = await findPlayerByRiotId(gameNameLower, tagLineLower).catch(() => null)
+  let puuid = dbPlayer?.puuid
+  let resolvedGameName = dbPlayer?.accountDetails?.gameName ?? gameName
+  let resolvedTagLine = dbPlayer?.accountDetails?.tagLine ?? tagLine
+
+  if (!puuid) {
+    touchSync(syncJob, {
+      phase: 'account',
+      message: 'WAITING FOR RIOT ACCOUNT LOOKUP',
+    })
+    const encGame = encodeURIComponent(gameName.trim())
+    const encTag = encodeURIComponent(tagLine.trim())
+    const account = await riotRequest(
+      `https://${massRegion}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encGame}/${encTag}`,
+      USER_PRIORITY,
+      signal
+    )
+    puuid = account.puuid
+    resolvedGameName = account.gameName
+    resolvedTagLine = account.tagLine
+    await upsertPlayer(puuid, {
+      gameNameLower,
+      tagLineLower,
+      accountDetails: { gameName: account.gameName, tagLine: account.tagLine },
+      lastUpdated: new Date(),
+    })
+  }
+
+  touchSync(syncJob, {
+    phase: 'match-ids',
+    message: 'CHECKING RIOT FOR NEW MATCH IDS',
+  })
+
+  // 2. Determine start time from the last successfully completed cursor.
+  // Partial newest-first writes do not advance this value, so the next sync
+  // rechecks the unfinished window and cannot skip older unprocessed matches.
+  const syncedThroughMs = dbPlayer?.matchHistorySyncedThrough ?? null
+  const startTimeSec = syncedThroughMs
+    ? Math.max(SET_RELEASE, Math.floor(syncedThroughMs / 1000) - MATCH_SYNC_OVERLAP_SECONDS)
+    : SET_RELEASE
+
+  // 3. Paginate all match IDs since start time (up to MAX_PAGES * IDS_PAGE_SIZE)
+  const allIds = await paginateMatchIds(puuid, massRegion, startTimeSec, signal, syncJob)
+
+  // 4. Filter out match IDs already in the database (safety net for edge cases)
+  const knownInDb = await filterKnownMatchIds(allIds).catch(() => new Set())
+  const newIds = allIds.filter(id => !knownInDb.has(id))
+  touchSync(syncJob, {
+    phase: newIds.length > 0 ? 'details' : 'rank',
+    message: newIds.length > 0 ? 'FETCHING NEW MATCH DETAILS' : 'MATCH CACHE IS CURRENT',
+    matchIdsFound: allIds.length,
+    totalNewMatches: newIds.length,
+    processedNewMatches: 0,
+  })
+
+  // 5. Fetch details for new matches only, upsert to MongoDB
+  let processedNewMatches = 0
+  for (const matchId of newIds) {
+    if (signal?.aborted) break
+    let detail
+    try {
+      detail = await riotRequest(
+        `https://${massRegion}.api.riotgames.com/tft/match/v1/matches/${matchId}`,
+        USER_PRIORITY,
+        signal
+      )
+    } catch (err) {
+      if (err?.name === 'AbortError' || err?.code === 'ERR_CANCELED') throw err
+      console.error('[getPlayerMatches] failed to fetch match', matchId, err?.message)
+      throw err
+    }
+
+    const isDoubleUp = detail.info?.tft_game_type === 'pairs'
+
+    const matchDoc = buildMatchDocument(detail)
+    try {
+      const { inserted } = await upsertMatch(matchDoc)
+      if (inserted) {
+        const allPuuids = (detail.info?.participants ?? []).map(p => p.puuid).filter(Boolean)
+        for (const pPuuid of allPuuids) {
+          addMatchIdsToPlayer(pPuuid, [matchId]).catch(() => {})
+        }
+        if (isDoubleUp) {
+          const self = detail.info?.participants?.find(p => p.puuid === puuid)
+          const partner = detail.info?.participants?.find(
+            p => p.puuid !== puuid && p.partner_group_id === self?.partner_group_id
+          )
+          if (partner?.puuid) {
+            upsertPartner(puuid, partner.puuid, new Date(detail.info.game_datetime)).catch(() => {})
+          }
+        }
+      }
+    } catch (err) {
+      console.error('[getPlayerMatches] failed to store match', matchId, err?.message)
+      throw err
+    }
+    processedNewMatches += 1
+    touchSync(syncJob, {
+      phase: 'details',
+      message: 'FETCHING NEW MATCH DETAILS',
+      processedNewMatches,
+    })
+  }
+
+  touchSync(syncJob, {
+    phase: 'rank',
+    message: 'REFRESHING DOUBLE UP RANK',
+  })
+
+  // Match detail payloads do not include rank. The TFT League endpoint is the
+  // exact source for current Double Up rank, so refresh it on every sync.
+  const rankInfo = await fetchRankInfo(puuid, region, signal)
+
+  const syncedAt = new Date()
+  const latestAfterSync = await getLatestMatchTimestamp(puuid).catch(() => null)
+  await markMatchHistorySynced(puuid, syncedAt, latestAfterSync ?? syncedAt.getTime())
+
+  touchSync(syncJob, {
+    phase: 'loading-cache',
+    message: 'LOADING UPDATED MONGO SNAPSHOT',
+  })
+
+  // 6. Load all stored Double Up matches from DB and return
+  const matchDocs = await findMatchesByPuuid(puuid, 0).catch(() => [])
+  const matches = matchDocs
+    .map(doc => normalizeMatch(doc, puuid, CURRENT_SET))
+    .filter(Boolean)
+    .sort((a, b) => b.date - a.date)
+
+  const rankSnapshots = await findRankSnapshots(puuid).catch(() => [])
+
+  return {
+    summoner: { gameName: resolvedGameName, tagLine: resolvedTagLine, puuid },
+    matches,
+    rankInfo,
+    rankSnapshots,
+    participantRanks: await buildParticipantRanks(matches, rankInfo, puuid),
+    cache: {
+      source: 'mongo',
+      matchCount: matches.length,
+      lastMatchAt: matches[0]?.date ?? null,
+      lastUpdated: syncedAt,
+    },
+  }
+}
+
+export function ensurePlayerRefresh(gameName, tagLine, region, options = {}) {
+  validateRiotId(gameName, tagLine)
+  const { force = false } = options
+  const key = syncKey(region, gameName, tagLine)
+  const existing = syncJobs.get(key)
+  const now = Date.now()
+
+  if (existing?.state === 'syncing') return publicSyncStatus(existing)
+  if (!force && existing && now - (existing.completedAt ?? existing.updatedAt ?? 0) < SYNC_RESTART_DELAY) {
+    return publicSyncStatus(existing)
+  }
+
+  const job = {
+    state: 'syncing',
+    phase: 'queued',
+    message: 'QUEUED FOR RIOT REFRESH',
+    startedAt: now,
+    updatedAt: now,
+    completedAt: null,
+    totalNewMatches: null,
+    processedNewMatches: 0,
+    matchIdsFound: null,
+  }
+  syncJobs.set(key, job)
+
+  getPlayerMatches(gameName, tagLine, region, null, job)
+    .then(() => {
+      touchSync(job, {
+        state: 'complete',
+        phase: 'complete',
+        message: 'MATCH HISTORY IS CURRENT',
+        etaSeconds: 0,
+        completedAt: Date.now(),
+      })
+    })
+    .catch(err => {
+      touchSync(job, {
+        state: 'error',
+        phase: 'error',
+        message: 'MATCH HISTORY REFRESH FAILED',
+        error: err?.response?.status === 404 ? 'RIOT ID NOT FOUND' : (err?.message || 'FAILED TO REFRESH MATCH DATA'),
+        completedAt: Date.now(),
+      })
+    })
+
+  setTimeout(() => {
+    const current = syncJobs.get(key)
+    if (current && current !== job) return
+    if (Date.now() - (job.completedAt ?? job.updatedAt ?? job.startedAt) >= SYNC_STATUS_TTL) {
+      syncJobs.delete(key)
+    }
+  }, SYNC_STATUS_TTL + SYNC_RESTART_DELAY)
+
+  return publicSyncStatus(job)
+}

@@ -1,0 +1,270 @@
+import { useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { useRefreshSummonerMatches, useSummonerMatches } from '../hooks/useSummonerMatches.js'
+import { useChampions } from '../hooks/useChampions.js'
+import { useItems } from '../hooks/useItems.js'
+import { useTraits } from '../hooks/useTraits.js'
+import { useRateLimitStats } from '../hooks/useRateLimitStats.js'
+import LandingSearchBar from '../components/LandingSearchBar.jsx'
+import SearchBar from '../components/SearchBar.jsx'
+import MatchTable from '../components/MatchTable.jsx'
+import SummonerProfileCard from '../components/SummonerProfileCard.jsx'
+import SummonerStatsCard from '../components/SummonerStatsCard.jsx'
+import LPGraph from '../components/LPGraph.jsx'
+import TeammatesCard from '../components/TeammatesCard.jsx'
+import styles from './MatchHistoryPage.module.css'
+
+function formatRiotId(gameName, tagLine) {
+  if (!gameName || !tagLine) return ''
+  return `${gameName}#${tagLine}`
+}
+
+function formatEta(seconds) {
+  if (!seconds) return 'Finalizing'
+  if (seconds < 60) return `${seconds}s`
+  const minutes = Math.ceil(seconds / 60)
+  return `${minutes}m`
+}
+
+function getSyncStatuses(data, isTwoPlayer) {
+  if (!data) return []
+  return isTwoPlayer
+    ? [data.summoner1?.sync, data.summoner2?.sync].filter(Boolean)
+    : [data.sync].filter(Boolean)
+}
+
+function getSyncProgress(syncStatuses) {
+  const syncing = syncStatuses.filter(sync => sync.state === 'syncing')
+  if (!syncing.length) return null
+  const eta = Math.max(...syncing.map(sync => sync.etaSeconds || 0))
+  const totals = syncing.map(sync => sync.totalNewMatches).filter(total => total != null)
+  const processed = syncing.reduce((sum, sync) => sum + (sync.processedNewMatches || 0), 0)
+
+  if (totals.length === syncing.length) {
+    const total = totals.reduce((sum, value) => sum + value, 0)
+    return { label: `${processed}/${total} new matches`, eta }
+  }
+
+  const idsFound = syncing.reduce((sum, sync) => sum + (sync.matchIdsFound || 0), 0)
+  return {
+    label: idsFound > 0 ? `${idsFound} match ids checked` : 'Resolving Riot data',
+    eta,
+  }
+}
+
+function isSameRiotId(a, b) {
+  return a?.gameName === b?.gameName && a?.tagLine === b?.tagLine
+}
+
+export default function MatchHistoryPage() {
+  const { t } = useTranslation()
+  const { region, gameName, tagLine, gameName2, tagLine2 } = useParams()
+
+  const id1 = gameName && tagLine ? { gameName, tagLine } : null
+  const id2 = gameName2 && tagLine2 ? { gameName: gameName2, tagLine: tagLine2 } : null
+  const ids = [id1, id2].filter(Boolean)
+  const isTwoPlayer = !!id2
+
+  const { data, isLoading, isError, error } = useSummonerMatches(region, ids)
+  const refreshMatches = useRefreshSummonerMatches(region, ids)
+  const { data: champions } = useChampions()
+  const { data: items } = useItems()
+  const { data: traits } = useTraits()
+  const { data: rlStats } = useRateLimitStats()
+
+  const summonerData = isTwoPlayer ? data?.summoner1 : data
+  const summoner2Data = isTwoPlayer ? data?.summoner2 : null
+
+  const [selectedTeammate1, setSelectedTeammate1] = useState(null)
+  const [selectedTeammate2, setSelectedTeammate2] = useState(null)
+
+  const filteredSummonerData = useMemo(() => {
+    if (!selectedTeammate1 || !summonerData) return summonerData
+    return { ...summonerData, matches: summonerData.matches.filter(m => m.partnerPuuid === selectedTeammate1) }
+  }, [summonerData, selectedTeammate1])
+
+  const filteredSummoner2Data = useMemo(() => {
+    if (!selectedTeammate2 || !summoner2Data) return summoner2Data
+    return { ...summoner2Data, matches: summoner2Data.matches.filter(m => m.partnerPuuid === selectedTeammate2) }
+  }, [summoner2Data, selectedTeammate2])
+
+  const loadedCount = (summonerData?.matches?.length || 0) + (summoner2Data?.matches?.length || 0)
+  const hasAnyMatches = loadedCount > 0
+  const syncStatuses = getSyncStatuses(data, isTwoPlayer)
+  const activeSyncs = syncStatuses.filter(sync => sync.state === 'syncing')
+  const syncErrors = syncStatuses.filter(sync => sync.state === 'error')
+  const syncProgress = getSyncProgress(syncStatuses)
+  const isSyncing = activeSyncs.length > 0
+  const showCachedShell = !!data && !hasAnyMatches && isSyncing
+  const syncNotFound = !hasAnyMatches && syncErrors.some(sync => sync.error === 'RIOT ID NOT FOUND')
+  const isNotFound = (isError && error?.response?.status === 404) || syncNotFound
+  const requestedIds = ids.map(id => formatRiotId(id.gameName, id.tagLine)).join(' / ')
+  const refreshError = refreshMatches.error?.response?.data?.error || refreshMatches.error?.message
+  const refreshTargetIds = refreshMatches.variables || []
+  const isRefreshingPlayer = (id, sync) => (
+    sync?.state === 'syncing' ||
+    (refreshMatches.isPending && refreshTargetIds.some(target => isSameRiotId(target, id)))
+  )
+  const handleRefreshPlayer = id => {
+    if (!id) return
+    refreshMatches.mutate([id])
+  }
+
+  if (isNotFound) {
+    return (
+      <div className={`${styles.page} ${styles.notFoundPage}`}>
+        <section className={styles.notFoundScene}>
+          <p className={styles.kicker}>{t('matchHistory.notFoundKicker')}</p>
+          <h1 className={styles.notFoundTitle}>{t('matchHistory.notFoundTitle', { id: requestedIds || 'Player' })}</h1>
+          <p className={styles.notFoundCopy}>{t('matchHistory.notFoundCopy')}</p>
+          <LandingSearchBar
+            defaultRegion={region}
+            defaultName={formatRiotId(gameName, tagLine)}
+          />
+        </section>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.page}>
+      <SearchBar
+        defaultRegion={region}
+        defaultName1={formatRiotId(gameName, tagLine)}
+        defaultName2={formatRiotId(gameName2, tagLine2)}
+      />
+
+      {isLoading && !data && (
+        <div className={styles.loadingBlock}>
+          <p className={styles.status} role="status">{t('matchHistory.loading')}</p>
+          {rlStats && rlStats.longQueueSize > 5 && (
+            <p className={styles.rateNote}>
+              {t('matchHistory.rateNote', { size: rlStats.longQueueSize, used: rlStats.requestsLastMinute, limit: rlStats.limitPerMinute * 2 })}
+            </p>
+          )}
+        </div>
+      )}
+      {isError && (
+        <p className={styles.error} role="alert">
+          {error?.response?.data?.error || t('matchHistory.error')}
+        </p>
+      )}
+      {refreshMatches.isError && (
+        <p className={styles.error} role="alert">
+          {refreshError || t('matchHistory.refreshError')}
+        </p>
+      )}
+
+      {data && (isSyncing || syncErrors.length > 0) && (
+        <div className={styles.syncNotice} role={isSyncing ? 'status' : 'alert'}>
+          <p className={styles.syncTitle}>
+            {isSyncing ? t('matchHistory.syncTitle') : t('matchHistory.syncPaused')}
+          </p>
+          <p className={styles.syncMeta}>
+            {t('matchHistory.syncCached', { count: loadedCount })}
+            {syncProgress ? ` / ${syncProgress.label} / ETA ${formatEta(syncProgress.eta)}` : ''}
+            {syncErrors.length > 0 ? ` / ${syncErrors[0].error || 'Refresh failed'}` : ''}
+          </p>
+        </div>
+      )}
+
+      {data && (
+        <>
+          {isTwoPlayer ? (
+            <>
+              <SummonerProfileCard
+                summoner={summonerData?.summoner}
+                rankInfo={summonerData?.rankInfo || null}
+                region={region}
+                showBookmarkButton
+                onRefresh={() => handleRefreshPlayer(id1)}
+                isRefreshing={isRefreshingPlayer(id1, summonerData?.sync)}
+                refreshDisabled={isSyncing}
+              />
+              <SummonerStatsCard
+                matches={summonerData?.matches || []}
+                resolvedChampions={champions || []}
+              />
+              <LPGraph
+                summoner={summonerData?.summoner}
+                rankSnapshots={summonerData?.rankSnapshots || []}
+                matches={summonerData?.matches || []}
+              />
+              <SummonerProfileCard
+                summoner={summoner2Data?.summoner}
+                rankInfo={summoner2Data?.rankInfo || null}
+                region={region}
+                onRefresh={() => handleRefreshPlayer(id2)}
+                isRefreshing={isRefreshingPlayer(id2, summoner2Data?.sync)}
+                refreshDisabled={isSyncing}
+              />
+              <SummonerStatsCard
+                matches={summoner2Data?.matches || []}
+                resolvedChampions={champions || []}
+              />
+              <LPGraph
+                summoner={summoner2Data?.summoner}
+                rankSnapshots={summoner2Data?.rankSnapshots || []}
+                matches={summoner2Data?.matches || []}
+              />
+            </>
+          ) : (
+            <>
+              <SummonerProfileCard
+                summoner={summonerData?.summoner}
+                rankInfo={summonerData?.rankInfo || null}
+                region={region}
+                showBookmarkButton
+                onRefresh={() => handleRefreshPlayer(id1)}
+                isRefreshing={isRefreshingPlayer(id1, summonerData?.sync)}
+                refreshDisabled={isSyncing}
+              />
+              <SummonerStatsCard
+                matches={summonerData?.matches || []}
+                resolvedChampions={champions || []}
+              />
+              <LPGraph
+                summoner={summonerData?.summoner}
+                rankSnapshots={summonerData?.rankSnapshots || []}
+                matches={summonerData?.matches || []}
+              />
+            </>
+          )}
+          {hasAnyMatches && (
+            <TeammatesCard
+              matches={summonerData?.matches || []}
+              selectedPuuid={selectedTeammate1}
+              onSelect={setSelectedTeammate1}
+            />
+          )}
+          {isTwoPlayer && hasAnyMatches && (
+            <TeammatesCard
+              matches={summoner2Data?.matches || []}
+              selectedPuuid={selectedTeammate2}
+              onSelect={setSelectedTeammate2}
+            />
+          )}
+
+          {showCachedShell ? (
+          <p className={styles.emptyCache} role="status">{t('matchHistory.noCached')}</p>
+          ) : (
+            <>
+              <h2 className={styles.recentGamesHeader}>{t('matchHistory.recentGames')}</h2>
+              <MatchTable
+                summonerData={filteredSummonerData}
+                summoner2Data={filteredSummoner2Data}
+                champions={champions || []}
+                items={items || []}
+                traits={traits || []}
+                selectedTeammate1={selectedTeammate1}
+                selectedTeammate2={selectedTeammate2}
+              />
+            </>
+          )}
+        </>
+      )}
+
+    </div>
+  )
+}

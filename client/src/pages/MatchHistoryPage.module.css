@@ -1,0 +1,190 @@
+.page {
+  padding: 3rem 2rem 4rem;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.status {
+  color: var(--text-secondary);
+  font-family: "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.81rem;
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: 1.17px;
+  text-transform: uppercase;
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Pulsing spectral dot */
+.status::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  animation: pulse 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+}
+
+.loadingBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rateNote {
+  color: var(--text-muted);
+  font-family: "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.syncNotice {
+  margin: 1.5rem 0 1.75rem;
+  padding: 14px 0;
+  border-top: 1px solid var(--bg-border-muted);
+  border-bottom: 1px solid var(--bg-border-muted);
+}
+
+.syncTitle {
+  color: var(--text-primary);
+  font-family: "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.81rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 1.17px;
+  text-transform: uppercase;
+  margin: 0 0 0.45rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.syncTitle::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+  animation: pulse 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.syncMeta,
+.emptyCache {
+  color: var(--text-muted);
+  font-family: "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 1.17px;
+  line-height: 1.35;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.emptyCache {
+  margin-top: 1.25rem;
+}
+
+.error {
+  color: var(--text-primary);
+  font-family: "D-DIN", Arial, Verdana, sans-serif;
+  font-size: 0.81rem;
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: 1.17px;
+  text-transform: uppercase;
+  margin-top: 1.5rem;
+  padding: 18px 0;
+  border-top: 1px solid var(--bg-border);
+  border-bottom: 1px solid var(--bg-border);
+  background: transparent;
+}
+
+.recentGamesHeader {
+  margin: 1.25rem 0.1rem 0.75rem 0rem;
+}
+
+.notFoundPage {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: min(720px, 72vh);
+  max-width: none;
+}
+
+.notFoundScene {
+  width: 100%;
+  max-width: 760px;
+  text-align: center;
+}
+
+.kicker {
+  color: var(--accent-gold);
+  font-family: "D-DIN-Bold", "D-DIN", Arial, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.17px;
+  line-height: 1;
+  margin: 0 0 18px;
+}
+
+.notFoundTitle {
+  color: var(--text-primary);
+  font-size: clamp(2rem, 8vw, 5.5rem);
+  letter-spacing: 0.96px;
+  line-height: 0.95;
+  margin: 0 auto 18px;
+  max-width: 740px;
+}
+
+.notFoundCopy {
+  color: var(--text-secondary);
+  font-family: "D-DIN", Arial, sans-serif;
+  font-size: 0.86rem;
+  letter-spacing: 1.17px;
+  line-height: 1.5;
+  margin: 0 0 34px;
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .status,
+  .syncTitle,
+  .syncMeta,
+  .rateNote,
+  .emptyCache,
+  .error {
+    line-height: 1.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status::before,
+  .syncTitle::before {
+    animation: none;
+  }
+}

@@ -1,0 +1,9 @@
+.icon {
+  display: inline-block;
+  vertical-align: -2px;
+  margin: 0 2px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.type_amp { fill: #ec4899; }
