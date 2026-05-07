@@ -1,4 +1,4 @@
-import axios from 'axios'
+import { apiGet } from '../api/client.js'
 import {
   REGION_CANONICAL_BY_ALIAS,
   REGION_DEFAULT_TAG,
@@ -68,6 +68,6 @@ export function summonerPath(region, id) {
 export async function resolveRiotIdCandidates(region, gameName) {
   const encodedRegion = encodeURIComponent(region)
   const encodedName = encodeURIComponent(gameName.trim())
-  const response = await axios.get(`/api/summoner/resolve/${encodedRegion}/${encodedName}`)
-  return response.data?.players || []
+  const response = await apiGet(`/api/summoner/resolve/${encodedRegion}/${encodedName}`)
+  return response?.players || []
 }

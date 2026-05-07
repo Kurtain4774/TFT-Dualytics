@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import axios from 'axios'
+import { apiGet } from '../api/client.js'
 import { useBookmarkStore } from '../store/bookmarkStore.js'
 import { usePlayerSearch } from '../hooks/usePlayerSearch.js'
 import { parseRiotIdWithDefaultTag, REGIONS } from '../utils/riotSearch.js'
@@ -67,7 +67,7 @@ export default function BookmarkModal({ defaultRegion = 'na', onClose }) {
     }
     setVerifying(true)
     try {
-      await axios.get(
+      await apiGet(
         `/api/summoner/${region}/${encodeURIComponent(id.gameName)}/${encodeURIComponent(id.tagLine)}`
       )
       addBookmark({ gameName: id.gameName, tagLine: id.tagLine, region })

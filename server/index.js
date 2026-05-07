@@ -16,8 +16,20 @@ import { connectMongo, createIndexes } from './db/mongo.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
+const allowedOrigins = (process.env.CLIENT_ORIGINS || 'http://localhost:5173')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean)
 
-app.use(cors({ origin: 'http://localhost:5173' }))
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+      callback(null, true)
+      return
+    }
+    callback(new Error('Not allowed by CORS'))
+  },
+}))
 app.use(express.json())
 
 app.use('/api/comps', compsRouter)
