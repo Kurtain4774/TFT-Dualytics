@@ -16,6 +16,7 @@ import { connectMongo, createIndexes } from './db/mongo.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
+const backgroundJobsEnabled = process.env.ENABLE_BACKGROUND_JOBS !== 'false'
 const allowedOrigins = (process.env.CLIENT_ORIGINS || 'http://localhost:5173')
   .split(',')
   .map(origin => origin.trim())
@@ -53,10 +54,17 @@ async function start() {
   }
 
   await fetchAndCacheAssets().catch(err => console.error('Asset fetch failed:', err.message))
-  await runCompAggregation().catch(err => console.error('Initial comp aggregation failed:', err.message))
+  if (backgroundJobsEnabled) {
+    await runCompAggregation().catch(err => console.error('Initial comp aggregation failed:', err.message))
+  }
 
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
+    if (!backgroundJobsEnabled) {
+      console.log('Background jobs disabled')
+      return
+    }
+
     // Re-aggregate every 10 minutes (Mongo-only, cheap)
     cron.schedule('*/10 * * * *', () => runCompAggregation().catch(console.error))
     // Sync top-50 leaderboard players' match histories every hour, then re-aggregate
